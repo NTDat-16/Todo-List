@@ -12,7 +12,7 @@
     <div>
         <h1>Todo list</h1>
         <input type="text" id="todo-input" placeholder="Enter a new todo">
-        <button id="add-btn" onclick="addTask()">Add</button>
+        <button id="add-btn" >Add</button>
         <ul id="todo-list"></ul>
     </div>
     <!-- from add -->
@@ -34,6 +34,15 @@
         <tbody id="taskTable">
         </tbody>
     </table>
+    
+    </div>
+    <!-- modal notification -->
+    <div id="notification" style="display: none;">
+       <p id="content-notification" ></p>
+        <p id="notification-message"></p>
+        <p id="notification-timer"> </p>
+        <button id="close-notification">Close</button>
+       
     
     </div>
 </body>
