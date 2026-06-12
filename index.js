@@ -1,19 +1,23 @@
-const task = JSON.parse(localStorage.getItem('tasks')) || [];
-if(task.length === 0){
-    task.push({
-        name:'learn english',
-        status:'pending'
-    });
+
+const data =JSON.parse(localStorage.getItem('tasks')) || [];
+const ArrTask = data.map(
+    item => new Task(
+        item.name,
+        item.status
+    )
+);
+if(ArrTask.length === 0){
+    ArrTask.push(new Task('learn english'));
     saveTask();
 }
 function saveTask(){
-localStorage.setItem('tasks',JSON.stringify(task));
+localStorage.setItem('tasks',JSON.stringify(ArrTask));
 }
 let addbtn = document.getElementById('add-btn');
 function renderTask(){
     const table= document.getElementById('taskTable');
      table.innerHTML = "";
-    task.forEach((task,index)=>{
+    ArrTask.forEach((task,index)=>{
     table.innerHTML +=`
         <tr>
             <td>${index + 1}</td>
@@ -38,10 +42,7 @@ function showNotification(types,title,message){
     notificationMessage.textContent = message;
     notification.style.display = 'block';
     notificationTimer.textContent = `Notification will close in ${timer} seconds`;
-   
-  
     contentNotification.textContent = title;
-
     if(types === 'success'){
         notification.style.border = '3px solid green';
     } else if(types === 'error'){
@@ -71,10 +72,7 @@ function addTask(){
         return;
 
     }
-    task.push({
-       name:taskName,
-       status:'pending'
-    });
+    ArrTask.push(new Task(taskName));
     showNotification(
         'success',
         'Success',
@@ -86,21 +84,17 @@ function addTask(){
 }
 function deleteTask(index){
 
-    task.splice(index,1);
+    ArrTask.splice(index,1);
     saveTask();
   showNotification(
     'success',
     'Success',
-    'Task status deleted  successfully'
+    'Task  deleted  successfully'
 );
     renderTask();
 }
 function changeTask(index){
-    if (task[index].status === 'pending') {
-        task[index].status = 'done';
-    } else {
-        task[index].status = 'pending';
-    }
+    ArrTask[index].changeStatus();  
   showNotification(
     'success',
     'Success',
@@ -110,7 +104,6 @@ function changeTask(index){
     renderTask();
 }
 renderTask();
-
 
 
 const btnAdd = document.getElementById('add-btn');
@@ -124,3 +117,4 @@ btnClose.addEventListener('click',()=>{
      
 
 
+    
