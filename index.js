@@ -1,54 +1,92 @@
+import Task from "./schema.js";
+// khai bao
+let countdown;
+const btnAdd = document.getElementById('add-btn');
+const btnClose= document.getElementById('close-notification');
+const notificationtime = 1000;
+const table= document.getElementById('task-table');
+const notification = document.getElementById('notification');   
+const notificationMessage = document.getElementById('notification-message');
+const contentNotification = document.getElementById('content-notification');
+const notificationTimer = document.getElementById('notification-timer');
+let input = document.getElementById('todo-input');
 
 const data =JSON.parse(localStorage.getItem('tasks')) || [];
-const ArrTask = data.map(
-    item => new Task(
-        item.name,
-        item.status
-    )
-);
-if(ArrTask.length === 0){
-    ArrTask.push(new Task('learn english'));
+const ArrTask = new Task();
+data.forEach(task => ArrTask.addTask(task.name));
+
+if(ArrTask.getTasks().length === 0){
+    ArrTask.addTask('learn english');
     saveTask();
 }
+// ham save
 function saveTask(){
-localStorage.setItem('tasks',JSON.stringify(ArrTask));
+localStorage.setItem('tasks',JSON.stringify(ArrTask.getTasks()));
 }
-let addbtn = document.getElementById('add-btn');
+// ham render
 function renderTask(){
-    const table= document.getElementById('taskTable');
-     table.innerHTML = "";
-    ArrTask.forEach((task,index)=>{
-    table.innerHTML +=`
-        <tr>
-            <td>${index + 1}</td>
-            <td>${task.name}</td>
-            <td>${task.status}</td>
-            <td>
-                <button onclick="changeTask(${index})">Change</button>
-                <button onclick="deleteTask(${index})">Delete</button>
-            </td>
-        </tr>`;
-
+    let html = '';
+    
+    ArrTask.getTasks().forEach((task,index) => {
+    html += `
+    <tr>
+        <td>${index + 1}</td>
+        <td>${escapeHtml(task.name)}</td>
+        <td>${task.status}</td>
+        <td>
+            <button class="btnchange" data-index="${index}">Change Status</button>
+            <button class="btndelete" data-index="${index}">Delete</button>  
+        </td>
+    </tr>
+    `;
     })
-}
+    table.innerHTML = html;
+    // gan action cho nut change cua bang
+document.querySelectorAll('.btnchange').forEach(btn => {
+    btn.addEventListener('click', ()=>{
+    const index = parseInt(btn.dataset.index);
+    ArrTask.changeTaskStatus(index);
+    saveTask();
+    showNotification(
+        'success',
+        'Success',
+        'Task status updated successfully'  );
+    renderTask();
 
- let countdown;
+    });
+});
+// gan action cho nut xoa cua bang
+document.querySelectorAll('.btndelete').forEach(btn =>{
+    btn.addEventListener('click', ()=>{
+        const index = parseInt(btn.dataset.index);
+        ArrTask.removeTask(index);
+        saveTask();
+        showNotification(
+            'success',
+            'Success',
+            'Task deleted successfully'
+        );
+        renderTask();
+    });
+})
+}
+// ham thong bao
 function showNotification(types,title,message){
-    const notification = document.getElementById('notification');   
-    const notificationMessage = document.getElementById('notification-message');
-    const contentNotification = document.getElementById('content-notification');
-    const notificationTimer = document.getElementById('notification-timer');
-    let timer = 5;
+   let timer = 5;
     notificationMessage.textContent = message;
     notification.style.display = 'block';
     notificationTimer.textContent = `Notification will close in ${timer} seconds`;
     contentNotification.textContent = title;
-    if(types === 'success'){
-        notification.style.border = '3px solid green';
-    } else if(types === 'error'){
-        notification.style.border = '3px solid red';
+    switch(types){
+        case 'success':
+            notification.style.border = '3px solid green';
+            break;
+        case 'error':
+            notification.style.border = '3px solid red';
+            break;
+        default:
+            notification.style.border = '3px solid gray';
     }
-
     clearInterval(countdown);
     countdown = setInterval(()=>{
     timer--;
@@ -58,12 +96,12 @@ function showNotification(types,title,message){
         notification.style.display = 'none';
     }    
 
-   },1000);
+   },notificationtime);
 }
+// ham add
 function addTask(){
-    let input = document.getElementById('todo-input');
     let taskName = input.value.trim();
-    if (taskName ===    '') {
+    if (taskName ==='') {
        showNotification(
         'error',
         'Error',
@@ -72,7 +110,7 @@ function addTask(){
         return;
 
     }
-    ArrTask.push(new Task(taskName));
+   ArrTask.addTask(taskName);
     showNotification(
         'success',
         'Success',
@@ -82,9 +120,10 @@ function addTask(){
     renderTask();
     input.value = '';
 }
+//ham xoa
 function deleteTask(index){
 
-    ArrTask.splice(index,1);
+    ArrTask.removeTask(index);
     saveTask();
   showNotification(
     'success',
@@ -93,8 +132,9 @@ function deleteTask(index){
 );
     renderTask();
 }
+//ham sua
 function changeTask(index){
-    ArrTask[index].changeStatus();  
+    ArrTask.changeTaskStatus(index);
   showNotification(
     'success',
     'Success',
@@ -103,16 +143,22 @@ function changeTask(index){
     saveTask();
     renderTask();
 }
-renderTask();
-
-
-const btnAdd = document.getElementById('add-btn');
-btnAdd.addEventListener('click', addTask);
-const btnClose= document.getElementById('close-notification');
-btnClose.addEventListener('click',()=>{
-    const notification = document.getElementById('notification');
+//ham dong thong nao
+function closeNotification(){
     notification.style.display = 'none';
-})
+}
+    // action add
+btnAdd.addEventListener('click', addTask);
+//action dong modal thong bao
+btnClose.addEventListener('click',closeNotification);
+
+function escapeHtml(text){
+const div = document.createElement('div');
+div.textContent= text;
+return div.innerHTML;
+
+}
+renderTask();
 
      
 
