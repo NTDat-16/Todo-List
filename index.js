@@ -1,78 +1,67 @@
-import Task from "./schema.js";
+import { TaskManager } from './repository.js';  
+import { STORAGE_KEY, NOTIFICATION_TIME } from './constants.js';
+import { saveToStorage, loadFromStorage, escapeHtml } from './libs.js';
+
 // khai bao
 let countdown;
 const btnAdd = document.getElementById('add-btn');
 const btnClose= document.getElementById('close-notification');
-const notificationtime = 1000;
 const table= document.getElementById('task-table');
 const notification = document.getElementById('notification');   
 const notificationMessage = document.getElementById('notification-message');
 const contentNotification = document.getElementById('content-notification');
 const notificationTimer = document.getElementById('notification-timer');
 let input = document.getElementById('todo-input');
-
-const data =JSON.parse(localStorage.getItem('tasks')) || [];
-const ArrTask = new Task();
-data.forEach(task => ArrTask.addTask(task.name));
-
-if(ArrTask.getTasks().length === 0){
-    ArrTask.addTask('learn english');
-    saveTask();
+let timer = 5;
+const currentTasks = loadFromStorage(STORAGE_KEY);
+const taskManager = new TaskManager();
+taskManager.loadFromJson(currentTasks);
+if(taskManager.getTasks().length === 0) { 
+    taskManager.addTask('learn english');
+    saveToStorage(STORAGE_KEY, taskManager.saveTask());
 }
-// ham save
-function saveTask(){
-localStorage.setItem('tasks',JSON.stringify(ArrTask.getTasks()));
-}
+
 // ham render
 function renderTask(){
     let html = '';
     
-    ArrTask.getTasks().forEach((task,index) => {
+    taskManager.getTasks().forEach((task,index) => {
     html += `
     <tr>
         <td>${index + 1}</td>
-        <td>${escapeHtml(task.name)}</td>
-        <td>${task.status}</td>
+        <td>${escapeHtml(task.getName())}</td>
+        <td>${task.getStatus()}</td>
         <td>
-            <button class="btnchange" data-index="${index}">Change Status</button>
-            <button class="btndelete" data-index="${index}">Delete</button>  
+            <button data-action="change" data-id="${index}">Change Status</button>
+            <button data-action="delete" data-id="${index}">Delete</button>
         </td>
     </tr>
     `;
     })
     table.innerHTML = html;
-    // gan action cho nut change cua bang
-document.querySelectorAll('.btnchange').forEach(btn => {
-    btn.addEventListener('click', ()=>{
-    const index = parseInt(btn.dataset.index);
-    ArrTask.changeTaskStatus(index);
-    saveTask();
-    showNotification(
-        'success',
-        'Success',
-        'Task status updated successfully'  );
+
+}
+// gam action cho table
+table.addEventListener('click',(event)=>{
+    const btn = event.target.closest('button[data-action]');
+    if(!btn) return;
+    const {action , id}= btn.dataset;
+     const index = parseInt(btn.dataset.id);
+    if (action==='change'){
+        taskManager.changeTask(id);
+        showNotification('success','Success','Task change status successfully')
+    }
+    if(action ==='delete'){
+        taskManager.removeTask(id);
+        showNotification('success','Success','Task deleted successfully')
+    }
+    saveToStorage(STORAGE_KEY, taskManager.saveTask());  
     renderTask();
 
-    });
-});
-// gan action cho nut xoa cua bang
-document.querySelectorAll('.btndelete').forEach(btn =>{
-    btn.addEventListener('click', ()=>{
-        const index = parseInt(btn.dataset.index);
-        ArrTask.removeTask(index);
-        saveTask();
-        showNotification(
-            'success',
-            'Success',
-            'Task deleted successfully'
-        );
-        renderTask();
-    });
 })
-}
 // ham thong bao
 function showNotification(types,title,message){
-   let timer = 5;
+   timer = 5;
     notificationMessage.textContent = message;
     notification.style.display = 'block';
     notificationTimer.textContent = `Notification will close in ${timer} seconds`;
@@ -96,7 +85,7 @@ function showNotification(types,title,message){
         notification.style.display = 'none';
     }    
 
-   },notificationtime);
+   },NOTIFICATION_TIME);
 }
 // ham add
 function addTask(){
@@ -110,37 +99,37 @@ function addTask(){
         return;
 
     }
-   ArrTask.addTask(taskName);
+   taskManager.addTask(taskName);
     showNotification(
         'success',
         'Success',
         'Task added successfully'
     );
-    saveTask();
+    saveToStorage(STORAGE_KEY, taskManager.saveTask());
     renderTask();
     input.value = '';
 }
 //ham xoa
 function deleteTask(index){
 
-    ArrTask.removeTask(index);
-    saveTask();
+taskManager.removeTask(index);
+ saveToStorage(STORAGE_KEY, taskManager.saveTask());
   showNotification(
     'success',
     'Success',
     'Task  deleted  successfully'
-);
+    );
     renderTask();
 }
 //ham sua
 function changeTask(index){
-    ArrTask.changeTaskStatus(index);
+    taskManager.changeTaskStatus(index);
   showNotification(
     'success',
     'Success',
     'Task status updated successfully'
 );
-    saveTask();
+saveToStorage(STORAGE_KEY, taskManager.saveTask());
     renderTask();
 }
 //ham dong thong nao
@@ -152,12 +141,6 @@ btnAdd.addEventListener('click', addTask);
 //action dong modal thong bao
 btnClose.addEventListener('click',closeNotification);
 
-function escapeHtml(text){
-const div = document.createElement('div');
-div.textContent= text;
-return div.innerHTML;
-
-}
 renderTask();
 
      

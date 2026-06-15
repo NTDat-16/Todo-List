@@ -1,33 +1,32 @@
-export default class Task {
-   TaskStatus = {
-        PENDING: 'pending',
-        DONE: 'done'
+import {TASK_STATUS} from './constants.js'
+export  class Task {
+    #name;
+    #status;
+  
+    constructor(name) {
+           this.#name=name;
+           this.#status= TASK_STATUS.PENDING;
     }
-    constructor() {
-            this.Task=[];
+  
+    getName(){ 
+        return this.#name; 
     }
-    addTask(taskName){
-        this.Task.push({
-            name: taskName,
-            status: this.TaskStatus.PENDING
-        });
-    
-    }
-    changeTaskStatus(index){
-        this.Task[index].status === this.TaskStatus.PENDING ? this.Task[index].status = this.TaskStatus.DONE : this.Task[index].status = this.TaskStatus.PENDING;
-    }
-    removeTask(index){
-        this.Task.splice(index,1);
+    getStatus(){
+        return this.#status; 
+        }
+    setName(name){
+        this.#name=name;
 
     }
-    getTasks(){
-        return this.Task;
+    changeStatus(){
+        this.#status = this.#status === TASK_STATUS.PENDING
+        ? TASK_STATUS.DONE
+        : TASK_STATUS.PENDING;    
     }
-   getName(index){
-     return this.Task[index].name; 
-    }
-
-    getStatus(index){ 
-        return this.Task[index].status; 
+    saveTask(){
+        return { 
+            name: this.#name,
+            status: this.#status 
+        } 
     }
 }
