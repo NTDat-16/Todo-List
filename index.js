@@ -1,6 +1,7 @@
 import { TaskManager } from './repository.js';  
-import { STORAGE_KEY, NOTIFICATION_TIME } from './constants.js';
-import { saveToStorage, loadFromStorage, escapeHtml } from './libs.js';
+import { STORAGE_KEY, NOTIFICATION_TIME,NOTIFICATION_TIMER  } from './constants.js';
+import {  getNotificationStylesByStatus, escapeHtml } from './libs.js';
+import { TaskStorage } from './storage.js';
 
 // khai bao
 let countdown;
@@ -12,13 +13,13 @@ const notificationMessage = document.getElementById('notification-message');
 const contentNotification = document.getElementById('content-notification');
 const notificationTimer = document.getElementById('notification-timer');
 let input = document.getElementById('todo-input');
-let timer = 5;
-const currentTasks = loadFromStorage(STORAGE_KEY);
-const taskManager = new TaskManager();
-taskManager.loadFromJson(currentTasks);
-if(taskManager.getTasks().length === 0) { 
+let timer = NOTIFICATION_TIMER;
+const taskStorage = new TaskStorage(STORAGE_KEY);
+const taskManager = new TaskManager(taskStorage.loadTasks());
+
+if (taskManager.getTasks().length === 0) {
     taskManager.addTask('learn english');
-    saveToStorage(STORAGE_KEY, taskManager.saveTask());
+    taskStorage.saveTasks(taskManager.getTasks());
 }
 
 // ham render
@@ -32,8 +33,8 @@ function renderTask(){
         <td>${escapeHtml(task.getName())}</td>
         <td>${task.getStatus()}</td>
         <td>
-            <button data-action="change" data-id="${index}">Change Status</button>
-            <button data-action="delete" data-id="${index}">Delete</button>
+            <button data-action="change" data-id="${task.getId()}">Change Status</button>
+            <button data-action="delete" data-id="${task.getId()}">Delete</button>
         </td>
     </tr>
     `;
@@ -55,27 +56,12 @@ table.addEventListener('click',(event)=>{
         taskManager.removeTask(id);
         showNotification('success','Success','Task deleted successfully')
     }
-    saveToStorage(STORAGE_KEY, taskManager.saveTask());  
+    taskStorage.saveTasks(taskManager.getTasks());
     renderTask();
 
 })
 // ham thong bao
-function showNotification(types,title,message){
-   timer = 5;
-    notificationMessage.textContent = message;
-    notification.style.display = 'block';
-    notificationTimer.textContent = `Notification will close in ${timer} seconds`;
-    contentNotification.textContent = title;
-    switch(types){
-        case 'success':
-            notification.style.border = '3px solid green';
-            break;
-        case 'error':
-            notification.style.border = '3px solid red';
-            break;
-        default:
-            notification.style.border = '3px solid gray';
-    }
+function startTimerNotification(){
     clearInterval(countdown);
     countdown = setInterval(()=>{
     timer--;
@@ -86,6 +72,17 @@ function showNotification(types,title,message){
     }    
 
    },NOTIFICATION_TIME);
+}
+function showNotification(types,title,message){
+   timer = 5;
+    notificationMessage.textContent = message;
+    notification.style.display = 'block';
+    notificationTimer.textContent = `Notification will close in ${timer} seconds`;
+    contentNotification.textContent = title;
+    let type = "success";
+    notification.style.border=getNotificationStylesByStatus(type);
+    startTimerNotification();
+    
 }
 // ham add
 function addTask(){
@@ -105,16 +102,16 @@ function addTask(){
         'Success',
         'Task added successfully'
     );
-    saveToStorage(STORAGE_KEY, taskManager.saveTask());
-    renderTask();
+ 
+    taskStorage.saveTasks(taskManager.getTasks());    renderTask();
     input.value = '';
 }
 //ham xoa
 function deleteTask(index){
 
 taskManager.removeTask(index);
- saveToStorage(STORAGE_KEY, taskManager.saveTask());
-  showNotification(
+ 
+    taskStorage.saveTasks(taskManager.getTasks());  showNotification(
     'success',
     'Success',
     'Task  deleted  successfully'
@@ -122,14 +119,14 @@ taskManager.removeTask(index);
     renderTask();
 }
 //ham sua
-function changeTask(index){
-    taskManager.changeTaskStatus(index);
+function changeTask(id){
+    taskManager.changeTaskStatus(id);
   showNotification(
     'success',
     'Success',
     'Task status updated successfully'
-);
-saveToStorage(STORAGE_KEY, taskManager.saveTask());
+    );
+    taskStorage.saveTasks(taskManager.getTasks());
     renderTask();
 }
 //ham dong thong nao

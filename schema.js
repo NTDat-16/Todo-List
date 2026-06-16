@@ -1,13 +1,18 @@
 import {TASK_STATUS} from './constants.js'
 export  class Task {
+    #id;
     #name;
     #status;
   
     constructor(name) {
+            this.#id = crypto.randomUUID();
            this.#name=name;
            this.#status= TASK_STATUS.PENDING;
     }
-  
+    getId(){
+        return this.#id;
+
+    }
     getName(){ 
         return this.#name; 
     }
@@ -18,10 +23,8 @@ export  class Task {
         this.#name=name;
 
     }
-    changeStatus(){
-        this.#status = this.#status === TASK_STATUS.PENDING
-        ? TASK_STATUS.DONE
-        : TASK_STATUS.PENDING;    
+    setStatus(status){
+        this.#status = status;
     }
     saveTask(){
         return { 

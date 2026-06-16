@@ -1,8 +1,11 @@
 // ham xu ly khi name truyen vao 
-export function escapeHtml(str){
-    const div= document.createElement('div');
-    div.textContent= str;
-    return div.innerHTML;
+export function escapeHtml(str) {
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }
 //luu du lieu vao local
 export function saveToStorage(key,data){
@@ -12,4 +15,12 @@ export function saveToStorage(key,data){
 export function loadFromStorage(key){
     return JSON.parse(localStorage.getItem(key)) ||[];
 
+}
+// ham style cho thong bao
+export function getNotificationStylesByStatus(type) {
+    switch (type) {
+        case 'success': return '3px solid green';
+        case 'error':   return '3px solid red';
+        default:        return '3px solid gray';
+    }
 }
