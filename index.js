@@ -79,8 +79,7 @@ function showNotification(types,title,message){
     notification.style.display = 'block';
     notificationTimer.textContent = `Notification will close in ${timer} seconds`;
     contentNotification.textContent = title;
-    let type = "success";
-    notification.style.border=getNotificationStylesByStatus(type);
+    notification.style.border = getNotificationStylesByStatus(types);
     startTimerNotification();
     
 }

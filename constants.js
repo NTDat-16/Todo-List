@@ -5,3 +5,8 @@ export const TASK_STATUS={
     PENDING: 'pending',
     DONE:"done"
 };
+export const STORAGE_KEY_EMPLOYEE='employees';
+export const EMPLOYEE_POSITION={
+    EMPLOYEE:'employee',
+    MANAGER:'manager'
+}
