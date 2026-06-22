@@ -1,51 +1,46 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title class="title" >Todo list </title>
-    <link rel="stylesheet" href="index.css">
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title class="title">Todo list</title>
+    <link rel="stylesheet" href="index.css" />
+  </head>
 
-<body>
+  <body>
     <!-- title and input feild and button add-->
     <div>
-        <button id="back-btn">← Back</button>
-        <h1>Todo list</h1>
-        <input type="text" id="todo-input" placeholder="Enter a new todo">
-        <button id="add-btn" >Add</button>
-        <ul id="todo-list"></ul>
+      <button id="back-btn">← Back</button>
+      <h1>Todo list</h1>
+      <input type="text" id="todo-input" placeholder="Enter a new todo" />
+      <button id="add-btn">Add</button>
+      <ul id="todo-list"></ul>
     </div>
     <!-- from add -->
-    <div class="input-container" style="display: none;">
-        <input type="text" id="edit-input" placeholder="Edit todo">
-        <button id="save-btn">Save</button  >
-
+    <div class="input-container" style="display: none">
+      <input type="text" id="edit-input" placeholder="Edit todo" />
+      <button id="save-btn">Save</button>
     </div>
     <div>
-        <table border="1">
+      <table border="1">
         <thead>
-            <tr>
-                <th>No.</th>
-                <th>Task</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
+          <tr>
+            <th>No.</th>
+            <th>Task</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
         </thead>
-<tbody id="task-table"></tbody>
-
-    </table>
-    
+        <tbody id="task-table"></tbody>
+      </table>
     </div>
     <!-- modal notification -->
-    <div id="notification" style="display: none;">
-       <p id="content-notification" ></p>
-        <p id="notification-message"></p>
-        <p id="notification-timer"> </p>
-        <button id="close-notification">Close</button>
-       
-    
+    <div id="notification" style="display: none">
+      <p id="content-notification"></p>
+      <p id="notification-message"></p>
+      <p id="notification-timer"></p>
+      <button id="close-notification">Close</button>
     </div>
-</body>
-<script type="module" src="./task.js"></script>
+  </body>
+  <script type="module" src="./task.js"></script>
 </html>
