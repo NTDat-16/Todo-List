@@ -1,3 +1,4 @@
+import { Employee } from '../schema/employee.js';
 export class EmployeeManager {
   #employees = [];
 
@@ -12,7 +13,17 @@ export class EmployeeManager {
   removeEmployee(id) {
     this.#employees = this.#employees.filter((e) => e.getId() !== id);
   }
+  updatePosition(id) {
+    const employee = this.#employees.find((e) => e.getId() === id);
+    if (!employee) return;
+    const currentPosition = employee.getPosition();
+    const newPosition =
+      currentPosition === EMPLOYEE_POSITION.EMPLOYEE
+        ? EMPLOYEE_POSITION.MANAGER
+        : EMPLOYEE_POSITION.EMPLOYEE;
 
+    employee.setPosition(newPosition);
+  }
   getEmployees() {
     return this.#employees;
   }

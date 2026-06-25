@@ -1,10 +1,11 @@
+import { EMPLOYEE_POSITION } from "../constants/constants.js";
 export class Employee {
   #id;
   #name;
   #position;
 
-  constructor(name, position = EMPLOYEE_POSITION.EMPLOYEE) {
-    this.#id = crypto.randomUUID();
+  constructor(name, position = EMPLOYEE_POSITION.EMPLOYEE,id=crypto.randomUUID()) {
+    this.#id = id;
     this.#name = name;
     this.#position = position;
   }
@@ -28,7 +29,7 @@ export class Employee {
     this.#position = position;
   }
 
-  toJSON() {
+ serialize() {
     return {
       id: this.#id,
       name: this.#name,

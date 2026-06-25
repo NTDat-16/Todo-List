@@ -5,10 +5,10 @@ export class Task {
   #name;
   #status;
   #employeeId;
-  constructor(name, employeeId) {
-    this.#id = crypto.randomUUID();
+  constructor(name, employeeId,status=TASK_STATUS.PENDING, id= crypto.randomUUID) {
+    this.#id = id;
     this.#name = name;
-    this.#status = TASK_STATUS.PENDING;
+    this.#status = status;
     this.#employeeId = employeeId;
   }
   getId() {
@@ -32,10 +32,7 @@ export class Task {
   getEmployeeId() {
     return this.#employeeId;
   }
-  setEmployeeId(employeeId) {
-    this.#employeeId = employeeId;
-  }
-  toJSON() {
+  serialize() {
     return {
       id: this.#id,
       name: this.#name,

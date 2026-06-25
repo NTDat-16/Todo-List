@@ -1,5 +1,5 @@
 import { Task } from "../schema/task.js";
-import {Employee} from "../schema/Employee.js"
+import {Employee} from "../schema/employee.js"
 import { TASK_STATUS } from "../constants/constants.js";
 
 export class TaskManager {
@@ -31,14 +31,5 @@ export class TaskManager {
   getTask(index) {
     return this.#tasks[index];
   }
-  loadFromJson(data) {
-    data.forEach((item) => {
-      const task = new Task(item.name);
-      if (item.status === TASK_STATUS.DONE) task.changeStatus();
-      this.#tasks.push(task);
-    });
-  }
-  saveTask() {
-    return this.#tasks.map((task) => task.saveTask());
-  }
+  
 }
