@@ -69,7 +69,7 @@ table.addEventListener('click', (event) => {
   if (action === 'change') {
     const emp = employeeManager.getEmployee(id);
     if (!emp) return;
-      updatePosition(employeeManager.getEmployee(id));
+    employeeManager.updatePosition(id);
       employeeStorage.saveEmployees(employeeManager.getEmployees());
       notif.show('success', 'Success', 'Employee updated successfully!');
       renderEmployees();
