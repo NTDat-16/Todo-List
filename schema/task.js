@@ -1,5 +1,4 @@
-import { TASK_STATUS } from "../constants/constants.js";
-import { EMPLOYEE_POSITION } from "../constants/constants.js";
+import { TASK_STATUS,EMPLOYEE_POSITION } from "../constants/constants.js";
 export class Task {
   #id;
   #name;

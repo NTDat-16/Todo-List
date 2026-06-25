@@ -4,10 +4,10 @@ import {
   STORAGE_KEY_EMPLOYEE,
   NOTIFICATION_TIME,
   NOTIFICATION_TIMER,
+  EMPLOYEE_POSITION
 } from './constants/constants.js';
 import { EmployeeStorage } from './storage/employee-storage.js';
 import { Employee } from './schema/employee.js';
-import { EMPLOYEE_POSITION } from './constants/constants.js';
 import { NotificationManager } from './NotificationManager.js';
 
 const employeeStorage = new EmployeeStorage(STORAGE_KEY_EMPLOYEE);
