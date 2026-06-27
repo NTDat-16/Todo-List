@@ -1,5 +1,5 @@
 import { EMPLOYEE_POSITION } from "../constants/constants.js";
-import {  Employee } from "../schema/employee.js";
+import {  Employee } from "../schema/Employee.js";
 import { saveToStorage, loadFromStorage } from "../libs/libs.js";
 export class EmployeeStorage {
   #storageKey;
