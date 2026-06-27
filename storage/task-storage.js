@@ -1,7 +1,7 @@
-import { TASK_STATUS, EMPLOYEE_POSITION } from "../constants/constants.js";
-import { Task } from "../schema/task.js";
-import { Employee } from "../schema/Employee.js";
-import { saveToStorage, loadFromStorage } from "../libs/libs.js";
+import { TASK_STATUS, EMPLOYEE_POSITION } from '../constants/constants.js';
+import { Task } from '../schema/task.js';
+import { Employee } from '../schema/Employee.js';
+import { saveToStorage, loadFromStorage } from '../libs/libs.js';
 export class TaskStorage {
   #storageKey;
   constructor(storageKey) {
@@ -9,10 +9,8 @@ export class TaskStorage {
   }
   loadTasks() {
     const data = loadFromStorage(this.#storageKey);
-    return data.map((item) => {
-      const task = new Task(item.name, item.employeeId,item.getId,item.getStatus);
-      return task;
-    });
+
+    return data.map((item) => new Task(item.name, item.employeeId, item.status, item.id));
   }
   saveTasks(tasks) {
     saveToStorage(

@@ -4,7 +4,7 @@ export class Task {
   #name;
   #status;
   #employeeId;
-  constructor(name, employeeId,status=TASK_STATUS.PENDING, id= crypto.randomUUID) {
+  constructor(name, employeeId,status=TASK_STATUS.PENDING, id= crypto.randomUUID()) {
     this.#id = id;
     this.#name = name;
     this.#status = status;

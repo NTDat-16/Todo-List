@@ -14,6 +14,7 @@ export class TaskManager {
   }
 
   changeTask(id) {
+console.log(id);
     const task = this.#tasks.find((t) => t.getId() === id);
     if (!task) return;
     task.setStatus(
@@ -23,6 +24,8 @@ export class TaskManager {
     );
   }
   removeTask(id) {
+  console.log(id);
+
     this.#tasks = this.#tasks.filter((t) => t.getId() !== id);
   }
   getTasks() {
