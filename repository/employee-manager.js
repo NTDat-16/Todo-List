@@ -1,4 +1,4 @@
-import { Employee } from '../schema/employee.js';
+import { Employee } from '../schema/Employee.js';
 import { EMPLOYEE_POSITION } from '../constants/constants.js';
 export class EmployeeManager {
   #employees = [];
