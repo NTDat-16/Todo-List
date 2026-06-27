@@ -7,7 +7,7 @@ import {
   EMPLOYEE_POSITION
 } from './constants/constants.js';
 import { EmployeeStorage } from './storage/employee-storage.js';
-import { Employee } from './schema/employee.js';
+import { Employee } from './schema/Employee.js';
 import { NotificationManager } from './NotificationManager.js';
 
 const employeeStorage = new EmployeeStorage(STORAGE_KEY_EMPLOYEE);
