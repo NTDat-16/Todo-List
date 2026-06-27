@@ -1,5 +1,5 @@
 import { Task } from "../schema/task.js";
-import {Employee} from "../schema/employee.js"
+import {Employee} from "../schema/Employee.js"
 import { TASK_STATUS } from "../constants/constants.js";
 
 export class TaskManager {

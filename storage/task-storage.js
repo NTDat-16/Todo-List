@@ -1,6 +1,6 @@
 import { TASK_STATUS, EMPLOYEE_POSITION } from "../constants/constants.js";
 import { Task } from "../schema/task.js";
-import { Employee } from "../schema/employee.js";
+import { Employee } from "../schema/Employee.js";
 import { saveToStorage, loadFromStorage } from "../libs/libs.js";
 export class TaskStorage {
   #storageKey;

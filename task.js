@@ -1,6 +1,6 @@
 import { TaskManager } from './repository/task-manager.js';
 import { EmployeeManager } from './repository/employee-manager.js';
-import { Employee } from './schema/employee.js';
+import { Employee } from './schema/Employee.js';
 import { TaskStorage } from './storage/task-storage.js';
 import { EmployeeStorage } from './storage/employee-storage.js';
 import { NotificationManager } from './NotificationManager.js';
