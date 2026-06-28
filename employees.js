@@ -1,5 +1,5 @@
 import { EmployeeManager } from './repository/employee-manager.js';
-import { escapeHtml, getNotificationStylesByStatus } from './libs/libs.js';
+import { escapeHtml, getNotificationStylesByStatus,createInputValidator } from './libs/libs.js';
 import {
   STORAGE_KEY_EMPLOYEE,
   NOTIFICATION_TIME,
@@ -17,16 +17,15 @@ if (employeeManager.getEmployees().length === 0) {
   employeeManager.addEmployee('Nguyen Van A', 'Developer');
   employeeStorage.saveEmployees(employeeManager.getEmployees());
 }
+const input = document.getElementById('todo-input');
+
+const inputValidator = createInputValidator(input);
 let countdown;
 let timer = NOTIFICATION_TIMER;
 const table = document.getElementById('employee-table');
 const btnClose = document.getElementById('close-notification');
-const notif = new NotificationManager({
-  notification: document.getElementById('notification'),
-  notificationMessage: document.getElementById('notification-message'),
-  contentNotification: document.getElementById('content-notification'),
-  notificationTimer: document.getElementById('notification-timer'),
-});
+const notif = new NotificationManager().init();
+
 function renderEmployees() {
   table.innerHTML = employeeManager
     .getEmployees()
@@ -61,7 +60,7 @@ table.addEventListener('click', (event) => {
       employeeManager.removeEmployee(id);
 
       employeeStorage.saveEmployees(employeeManager.getEmployees());
-      notif.show('success', 'Success', 'Employee deleted successfully!');
+      notif.success( 'Employee deleted successfully!');
       renderEmployees();
     }
   }
@@ -71,20 +70,19 @@ table.addEventListener('click', (event) => {
     if (!emp) return;
     employeeManager.updatePosition(id);
       employeeStorage.saveEmployees(employeeManager.getEmployees());
-      notif.show('success', 'Success', 'Employee updated successfully!');
+     notif.success( 'Employee updated successfully!');
       renderEmployees();
     }
   
 });
 function addEmployee(nameEmployee) {
-  if (nameEmployee === '') {
-    notif.show('error', 'Error', 'Ten khong duoc de trong!');
-    return;
-  }
+ const emplyeeName = escapeHtml(input.value.trim());
+ if (!inputValidator.validate('Employee name cannot be empty')) return;
+  clearInputError();
   employeeManager.addEmployee(nameEmployee, EMPLOYEE_POSITION.EMPLOYEE);
   employeeStorage.saveEmployees(employeeManager.getEmployees());
 
-  notif.show('success', 'Success', 'Task added successfully');
+     notif.success( 'Employee updated successfully!');
   renderEmployees();
 }
 table.addEventListener('click', (event) => {

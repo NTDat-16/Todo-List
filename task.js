@@ -16,6 +16,7 @@ import {
   getNotificationStylesByStatus,
   getEmployeeIdFromUrl,
   redirectTo,
+  clearInputError,createInputValidator,
 } from './libs/libs.js';
 
 const employeeId = getEmployeeIdFromUrl();
@@ -32,13 +33,8 @@ const taskStorage = new TaskStorage(STORAGE_KEY);
 const employeeStorage = new EmployeeStorage(STORAGE_KEY_EMPLOYEE);
 const taskManager = new TaskManager(taskStorage.loadTasks());
 const employeeManager = new EmployeeManager(employeeStorage.loadEmployees());
-
-const notif = new NotificationManager({
-  notification: document.getElementById('notification'),
-  notificationMessage: document.getElementById('notification-message'),
-  contentNotification: document.getElementById('content-notification'),
-  notificationTimer: document.getElementById('notification-timer'),
-});
+const inputValidator = createInputValidator(input);
+const notif = new NotificationManager().init();
 const currentemployee = employeeManager.getEmployee(employeeId);
 if (!currentemployee) redirectTo('index.html');
 document.querySelector('h1').textContent = `Task of ${currentemployee.getName()}`;
@@ -76,10 +72,13 @@ table.addEventListener('click', (event) => {
 
   if (action === 'change') {
     taskManager.changeTask(id);
-notif.show('success', 'Success', 'Task status updated successfully');  }
+    notif.success('Task status updated successfully');
+  
+}
   if (action === 'delete') {
     taskManager.removeTask(id);
-    notif.show('success', 'Success', 'Task deleted successfully');
+        notif.success('Task deleted successfully');
+
   }
 
   taskStorage.saveTasks(taskManager.getTasks());
@@ -87,13 +86,12 @@ notif.show('success', 'Success', 'Task status updated successfully');  }
 });
 function addTask() {
   const taskName = escapeHtml(input.value.trim());
-  if (!taskName) {
-    notif.show('error', 'Error', 'Task Name not null');
-    return;
-  }
+ if (!inputValidator.validate('Task name cannot be empty')) return;
+  clearInputError();
   taskManager.addTask(taskName, employeeId);
   taskStorage.saveTasks(taskManager.getTasks());
-  notif.show('success', 'Success', 'Task added successfully');
+    notif.success('Task status updated successfully');
+
   renderTask();
   input.value = '';
 }
