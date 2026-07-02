@@ -1,20 +1,22 @@
-import { TaskManager } from './repository/task-manager.js';
-import { STORAGE_KEY, NOTIFICATION_TIMER } from './constants/constants.js';
+import { EntityManager } from './core/EmtityManager.js';
+import { Task } from './schema/task.js';
 import { escapeHtml, createInputValidator } from './libs/libs.js';
-import { TaskStorage } from './storage/task-storage.js';
 import { NotificationManager } from './NotificationManager.js';
+import { TaskRepository } from './repository/TaskRepository.js';
 
-const btnAdd  = document.getElementById('add-btn') as HTMLButtonElement;
-const table   = document.getElementById('task-table') as HTMLTableSectionElement;
-const input   = document.getElementById('todo-input') as HTMLInputElement;
+const em = new EntityManager();
+em.loadAll();
+const taskRepository = em.getRepository(Task) as TaskRepository;
 
-const taskStorage = new TaskStorage(STORAGE_KEY);
-const taskManager = new TaskManager(taskStorage.loadTasks());
-const notif       = new NotificationManager().init();
+const btnAdd = document.getElementById('add-btn') as HTMLButtonElement;
+const table  = document.getElementById('task-table') as HTMLTableSectionElement;
+const input  = document.getElementById('todo-input') as HTMLInputElement;
+
+const notif          = new NotificationManager().init();
 const inputValidator = createInputValidator(input);
 
 function renderTask(): void {
-    const tasks = taskManager.getTasks();
+    const tasks = taskRepository.findAll();
 
     if (tasks.length === 0) {
         table.innerHTML = `
@@ -38,21 +40,25 @@ function renderTask(): void {
 }
 
 table.addEventListener('click', (event: MouseEvent) => {
-    const btn = (event.target as HTMLElement).closest('button[data-action]') as HTMLButtonElement;
+    const btn = (event.target as HTMLElement).closest('button[data-action]') as HTMLButtonElement | null;
     if (!btn) return;
 
     const { action, id } = btn.dataset;
+    if (!id) return;
 
     if (action === 'change') {
-        taskManager.changeTask(id!);
+        taskRepository.toggleStatus(id);
+        em.flush();
         notif.success('Task status updated successfully');
     }
     if (action === 'delete') {
-        taskManager.removeTask(id!);
+        const task = taskRepository.findById(id);
+        if (!task) return;
+        em.remove(task);
+        em.flush();
         notif.success('Task deleted successfully');
     }
 
-    taskStorage.saveTasks(taskManager.getTasks());
     renderTask();
 });
 
@@ -61,8 +67,10 @@ function addTask(): void {
 
     const taskName = escapeHtml(input.value.trim());
     inputValidator.clear();
-    taskManager.addTask(taskName,crypto.randomUUID());
-    taskStorage.saveTasks(taskManager.getTasks());
+
+    const task = new Task(taskName);
+    em.persist(task);
+    em.flush();
     notif.success('Task added successfully');
     renderTask();
     input.value = '';

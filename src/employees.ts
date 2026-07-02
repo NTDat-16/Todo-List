@@ -1,29 +1,29 @@
-import { EmployeeManager } from './repository/employee-manager.js';
+import { EntityManager } from './core/EmtityManager.js';
+import { Employee } from './schema/employee.js';
 import { escapeHtml, createInputValidator } from './libs/libs.js';
-import { STORAGE_KEY_EMPLOYEE, EMPLOYEE_POSITION } from './constants/constants.js';
-import { EmployeeStorage } from './storage/employee-storage.js';
+import { EMPLOYEE_POSITION } from './constants/constants.js';
 import { NotificationManager } from './NotificationManager.js';
+import { EmployeeRepository } from './repository/EmployeeRepository.js';
 
-const employeeStorage = new EmployeeStorage(STORAGE_KEY_EMPLOYEE);
-const employeeManager = new EmployeeManager(employeeStorage.loadEmployees());
+const em = new EntityManager();
+em.loadAll();
+const employeeRepository = em.getRepository(Employee) as EmployeeRepository;
 
 const btnAdd = document.getElementById('add-btn') as HTMLButtonElement;
-const table = document.getElementById('employee-table') as HTMLTableSectionElement;
-const input = document.getElementById('todo-input') as HTMLInputElement;
+const table  = document.getElementById('employee-table') as HTMLTableSectionElement;
+const input  = document.getElementById('todo-input') as HTMLInputElement;
 
+const notif          = new NotificationManager().init();
 const inputValidator = createInputValidator(input);
-const notif = new NotificationManager().init();
 
-if (employeeManager.getEmployees().length === 0) {
-  employeeManager.addEmployee('Nguyen Van A', EMPLOYEE_POSITION.EMPLOYEE);
-  employeeStorage.saveEmployees(employeeManager.getEmployees());
+if (employeeRepository.findAll().length === 0) {
+    const defaultEmp = new Employee('Nguyen Van A', EMPLOYEE_POSITION.EMPLOYEE);
+    em.persist(defaultEmp);
+    em.flush();
 }
 
 function renderEmployees(): void {
-  table.innerHTML = employeeManager
-    .getEmployees()
-    .map(
-      (emp) => `
+    table.innerHTML = employeeRepository.findAll().map(emp => `
         <tr>
             <td>${escapeHtml(emp.getName())}</td>
             <td>${emp.getPosition()}</td>
@@ -33,49 +33,48 @@ function renderEmployees(): void {
                 <button data-action="delete" data-id="${emp.getId()}">Delete</button>
             </td>
         </tr>
-    `,
-    )
-    .join('');
+    `).join('');
 }
 
 table.addEventListener('click', (event: MouseEvent) => {
-  const btn = (event.target as HTMLElement).closest('button[data-action]') as HTMLButtonElement;
-  if (!btn) return;
+    const btn = (event.target as HTMLElement).closest('button[data-action]') as HTMLButtonElement | null;
+    if (!btn) return;
 
-  const { action, id } = btn.dataset;
+    const { action, id } = btn.dataset;
+    if (!id) return;
 
-  if (action === 'view') {
-    window.location.href = `src/task.html?employeeId=${id}`;
-  }
+    if (action === 'view') {
+        window.location.href = `task.html?employeeId=${id}`;
+    }
 
-  if (action === 'delete') {
-    if (!confirm('Are you sure you want to delete this employee?')) return;
-    employeeManager.removeEmployee(id!);
-    employeeStorage.saveEmployees(employeeManager.getEmployees());
-    notif.success('Employee deleted successfully!');
-    renderEmployees();
-  }
+    if (action === 'delete') {
+        if (!confirm('Are you sure?')) return;
+        const emp = employeeRepository.findById(id);
+        if (!emp) return;
+        em.remove(emp);
+        em.flush();
+        notif.success('Employee deleted successfully!');
+        renderEmployees();
+    }
 
-  if (action === 'change') {
-    const emp = employeeManager.getEmployee(id!);
-    if (!emp) return;
-    employeeManager.updatePosition(id!);
-    employeeStorage.saveEmployees(employeeManager.getEmployees());
-    notif.success('Employee position updated successfully!');
-    renderEmployees();
-  }
+    if (action === 'change') {
+        employeeRepository.updatePosition(id);
+        em.flush();
+        notif.success('Employee position updated successfully!');
+        renderEmployees();
+    }
 });
 
-function addEmployee(nameEmployee: string): void {
-  if (!inputValidator.validate('Employee name cannot be empty')) return;
-  inputValidator.clear();
+function addEmployee(name: string): void {
+    if (!inputValidator.validate('Employee name cannot be empty')) return;
+    inputValidator.clear();
 
-  const employeeName = escapeHtml(nameEmployee);
-  employeeManager.addEmployee(employeeName, EMPLOYEE_POSITION.EMPLOYEE);
-  employeeStorage.saveEmployees(employeeManager.getEmployees());
-  notif.success('Employee added successfully!');
-  renderEmployees();
-  input.value = '';
+    const emp = new Employee(escapeHtml(name), EMPLOYEE_POSITION.EMPLOYEE);
+    em.persist(emp);
+    em.flush();
+    notif.success('Employee added successfully!');
+    renderEmployees();
+    input.value = '';
 }
 
 btnAdd.addEventListener('click', () => addEmployee(input.value.trim()));
